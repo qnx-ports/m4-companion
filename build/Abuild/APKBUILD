@@ -1,0 +1,44 @@
+# This can only be compiled natively on QNX (for now)
+# Maintainer: Aaron Bassett <abassett@qnx.com>
+pkgname=m4
+pkgver=1.4.19
+pkgrel=0
+pkgdesc="GNU macro processor"
+url="https://www.gnu.org/software/m4"
+arch="all"
+license="GPL-3.0-or-later"
+depends="qnx-io-sock"
+makedepends="qnx-io-sock-dev"
+subpackages="$pkgname-doc"
+source="https://mirror.csclub.uwaterloo.ca/gnu/m4/m4-$pkgver.tar.xz
+        "
+builddir="${srcdir}/m4-${pkgver}"
+
+build() {
+    if [[ $CBUILD = $CHOST ]]; then
+        # Compile natively
+        echo "No additional arguments are required"
+    else
+        # Cross compiling
+        echo "m4 is not yet ready for corss compiling"
+        exit 1;
+    fi
+
+   CHOST="$CHOST" \
+   ./configure \
+        --build=$CBUILD \
+        --host=$CHOST \
+        --prefix=/usr \
+        CFLAGS=-D_QNX_SOURCE \
+        LDFLAGS="-lm -lregex -lsocket -lgcc_s"
+
+    make
+}
+
+package() {
+    make DESTDIR="$pkgdir/" install
+}
+
+sha512sums="
+47f595845c89709727bda0b3fc78e3188ef78ec818965b395532e7041cabe9e49677ee4aca3d042930095a7f8df81de3da1026b23b6897be471f6cf13ddd512b  m4-1.4.19.tar.xz
+"
